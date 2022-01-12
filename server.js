@@ -1,7 +1,6 @@
 const path = require('path');
 const express = require('express');
 const sql = require('mssql');
-const { query } = require('express');
 
 const app = express();
 
@@ -25,88 +24,82 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/indexform.htm');
 })
 
-//getting data from sql server
-const getData = (empid) => {
-    sql.connect(dbConfig).then(pool => {
-        // Query
-        return pool.request().query(`select * from EmpTable1 where EmployeeID=${empid}`)
-    }).then(result => {
-        console.dir(result)
-    }).catch(err => {
-      console.log(err)
-    });
-}
-
-const insertData = (Queryy) => {
-    sql.connect(dbConfig).then(pool => {
-
-        const transaction = new sql.Transaction(pool)
-        transaction.begin(err => {
-            if (err) {         // ... error checks
-                console.log("Error in Transaction Begin " + err);
-            }
-            else {
-                const request = new sql.Request(transaction)
-                request.query(`INSERT INTO EmpTable1 VALUES (${Queryy})`, (err, result) => {
-                    if (err)       // ... error checks
-                        console.log(err);
-                    else {
-                        transaction.commit(err => {
-                            if (err)       // ... error checks
-                                console.log("Error in Transaction Commit " + err);
-                            else
-                                //Transaction committed
-                                console.log(result);
-                        })
-                    }
-                })
-            }
-        })
-    
-    }).catch(err => {
-        console.log(err)
-    });
-}
-app.post('/Add',(req,res)=>{
-    //console.log(req.body);
-    const id= req.body[0]
-    sql.connect(dbConfig).then(pool => {
-        // Query
-        return pool.request().query(`select * from EmpTable1 where EmployeeID = ${id}`)
-    }).then(result => {
-        //console.log(result)
-        if(result.recordset.length === 0){
-            let formdata = req.body;
-            let query = String(formdata[0]);
-            for(let i=1;i<formdata.length;i++){
-                query = query.concat(',');
-                if(formdata[i]==null)
-                    query = query.concat('null');
-                else
-                    query = query.concat(`'${formdata[i]}'`);
-            }
-            insertData(query);
-            res.status(200).send('Record added successfully');
-        }
-        else{
-            res.status(406).send('EmployeeID Already exists')
-        }
-    }).catch(err => {
-      res.status(400).send('Insertion Failed')
-    });
-    /*let formdata = req.body;
-    let query = String(formdata[0]);
-    for(let i=1;i<formdata.length;i++)
-    {
-        query = query.concat(',');
-        if(formdata[i]==null)
-            query = query.concat('null');
-        else{
-            query = query.concat(`'${formdata[i]}'`);
-        }
+const getData = async (tablename, id) => {             //it is advisable for the value returning promise function to be in async-await
+    try {
+        let pool = await sql.connect(dbConfig);
+        let data = await pool.request().query(`SELECT * from ${tablename} where EmpID=${id}`)
+        return data.recordset;             //returning values with promises
     }
-    //let query="1234,'John','Doe','MGRFCT','Assistant HR','A','Level 1','Permanent','2021-12-08','ww','wwww','MIS','MGRFCT->SREFCT','NA','Yes',null,null,'NA',null,null,'Yes',null,null,'NA',null,null,'Yes',null,null,'No',null,'Yes',null,'ITC_ALL_USERS ITD_Wired_Network_Access',null,'Yes',null,'Yes',null,null,'Yes',null,null,null,'Individual',null,null,null,null,'LN on Mobile',null,null,'temporary',null,'werr','wert','rtyuiii',null,'ITD/SREFCT',null"
-    insertData(query); */ 
+    catch (err) {
+        throw err
+    }
+}
+
+app.post('/getData', (req, res) => {
+    //console.log(req.body);
+    const id = req.body.Eid
+    getData('Curr_EmpTable', id).then(result => {
+        let userdata = result[0];
+        console.log(userdata)
+        if (userdata === undefined)
+            res.json({ status: 204 })
+        else
+            res.json({ status: 200, data: userdata })
+    }).catch(err => {
+        res.json({ status: 400 })
+        console.log(err)
+        //res.send("error : "+err);
+    });
+})
+
+const executeProcedure = async (qry1, qry2) => {
+    console.log('In here');
+    try {
+        // sql connection
+        let pool = await sql.connect(dbConfig);
+        const transaction = new sql.Transaction(pool);
+        try {
+            await transaction.begin();
+
+            const request = new sql.Request(transaction);
+
+            const result1 = await request.query(qry1)
+            const result2 = await request.query(qry2)
+            //console.log(result1)
+            //console.log(result2)
+            await transaction.commit();
+        } catch (err) {
+            await transaction.rollback();
+            throw err;
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+app.post('/postData', (req, res) => {
+    //console.log(req.body);
+    let { empId, qry1, qry2, firstEntry } = req.body
+    let query1 = `INSERT INTO EmpTable VALUES (${qry1})`;
+    let query2 = ''
+    if (firstEntry)
+        query2 = `INSERT INTO Curr_EmpTable VALUES (${qry2})`;
+    else
+        query2 = `UPDATE Curr_EmpTable SET ${qry2} WHERE EmpID=${empId}`;
+    //console.log(queries)
+    console.log(query1)
+    console.log(query2)
+    executeProcedure(query1, query2).then(result => {
+        //let test = result;
+        //console.log(test)
+        res.sendStatus(200)
+    }).catch(err => {
+        res.sendStatus(400)
+        console.log("error: " + err)
+    });;
+})
+
+app.get('/submitted',(req,res)=>{
+    res.sendFile(__dirname + '/Submitted.htm')
 })
 
 app.listen(3003, function () {
