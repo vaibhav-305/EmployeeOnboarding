@@ -13,16 +13,18 @@
 </head>
 
 <body>
-    <br><br>
+    <br>
+    <h4 class='text-center font-weight-bold'>User Access Form</h4>
+    <hr>
     <form id='myForm' onsubmit="Submit(event)">
         <section id="DemographicDetails" class="container-fluid table-responsive">
             <table class="table table-bordered">
-                <!--<colgroup>
+                <colgroup>
                     <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 35%;">
+                    <col span="1" style="width: 38%;">
                     <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 35%;">
-                </colgroup>-->
+                    <col span="1" style="width: 32%;">
+                </colgroup>
                 <tbody>
                     <tr>
                         <th colspan="4" class="text-center">Demographic details</th>
@@ -30,39 +32,43 @@
                     <tr>
                         <td><label class="required-field">Action</label></td>
                         <td>
-                            <select id="action" onchange="changeAction(event)" required>
+                            <select id="action" onchange="changeAction(event)" onblur="checkEmpty(this)" required>
+                                <option  value="">~Choose~</option>
                                 <option value="Add">Add</option>
                                 <option value="Change">Change</option>
                                 <option value="Transfer">Transfer</option>
                             </select>
+                            <small class='HelpBlock'></small>
                         </td>
                         <td><label class="required-field">Date of request</label></td>
                         <td>
-                            <input type="date" id="DOR" onblur="checkEmpty(this)" required>
+                            <input type="date" id="Dor" onblur="checkEmpty(this)" onchange="datecheck(this)" required>
                             <small class='HelpBlock'></small>
                         </td>
                     </tr>
                     <tr>
                         <td><label class="required-field">First Name</label></td>
                         <td>
-                            <input type="text" id='firstname' onblur="checkEmpty(this)" required>
+                            <input type="text" onkeydown="return alphaOnly(event);" id='firstname'
+                                onblur="checkEmpty(this)" required>
                             <small class='HelpBlock'></small>
                         </td>
                         <td><label class="required-field">Employee Number</label></td>
                         <td>
-                            <input type="number" id='EmpID' required onblur="checkEmpty(this)">
+                            <input type="text" id='EmpID' required onblur="checkEmpty(this)">
                             <small class='HelpBlock'></small>
                         </td>
                     </tr>
                     <tr>
                         <td><label class="required-field">Last Name</label></td>
                         <td>
-                            <input type="text" id='lastname' required onblur="checkEmpty(this)">
+                            <input type="text" onkeydown="return alphaOnly(event);" id='lastname' required
+                                onblur="checkEmpty(this)">
                             <small class='HelpBlock'></small>
                         </td>
                         <td><label class="required-field">New reporting manager name</label></td>
                         <td>
-                            <input type="text" id="newRepMan" required onblur="checkEmpty(this)">
+                            <input type="text" onkeydown="return alphaOnly(event);" id="newRepMan" required onblur="checkEmpty(this)">
                             <small class='HelpBlock'></small>
                         </td>
                     </tr>
@@ -75,18 +81,22 @@
                         </td>
                         <td><label class="required-field">Previous Reporting Manager's Name</label> </td>
                         <td>
-                            <input type="text" id='prevRepMan' required onblur="checkEmpty(this)">
-                            <small class='HelpBlock'></small>
+                            <input type="text" id='prevRepMan' value='NA' required disabled onkeydown="return alphaOnly(event);">
                         </td>
                     </tr>
-                    <tr +rowspan="2">
-                        <td rowspan="2"><label class="required-field">Designation and Grade/Level</label></td>
+                    <tr>
+                        <td rowspan="2"><label class="required-field">Designation and Grade/Level </label></td>
                         <td rowspan="2">
-                            <input type="text" id='designation' list="Designationlist" required onblur="checkEmpty(this)">
-                            <small class='HelpBlock'></small>
-                            <datalist id="Designationlist"> </datalist>
-                            <select id="Grade" required> </select>
-                            <select id="Level" required> </select>
+                            <div style="display: flex; flex-wrap: wrap; gap: 2%;">
+                                <div style="width: 55%;">
+                                    <input type="text" id='designation' list="Designationlist" required
+                                        onblur="checkEmpty(this)">
+                                    <small class='HelpBlock'></small>
+                                    <datalist id="Designationlist"> </datalist>
+                                </div>
+                                <select id="Grade" style="width: 20%;" required> </select>
+                                <select id="Level" style="width: 20%;" required> </select>
+                            </div>
                         </td>
                         <td><label class="required-field">Function / Department</label></td>
                         <td>
@@ -98,8 +108,7 @@
                     <tr>
                         <td><label class="required-field">Transfer From/To</label></td>
                         <td>
-                            <input type="text" id='transfer' list="Transferlist" required onblur="checkEmpty(this)">
-                            <small class='HelpBlock'></small>
+                            <input type="text" id='transfer' list="Transferlist" value='NA' required disabled>
                             <datalist id="Transferlist"> </datalist>
                         </td>
                     </tr>
@@ -113,7 +122,7 @@
                         </td>
                         <td><label class="required-field">Validity Period</label></td>
                         <td>
-                            <input type="text" id="vp" value="NA" readonly required onblur="checkEmpty(this)">
+                            <input type="text" id="vp" value="default" readonly required onblur="checkEmpty(this)" onchange="datecheck(this)">
                             <small class='HelpBlock'></small>
                         </td>
                     </tr>
@@ -142,55 +151,59 @@
                     <tr>
                         <td>Network Login ID- Individual (AD Access)</td>
                         <td>
-                            <select id="net-ind">
+                            <select id="netInd1">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" disabled>NA</option>
                             </select>
                         </td>
-                        <td><input type="text" class="txt-ind" id='net-ind2'></td>
-                        <td><input type="text" placeholder='\\10.1.16.31\Users$\' class="txt-ind" id='net-ind3'></td>
+                        <td><input type="text" class="txt-ind" id='netInd2'></td>
+                        <td><input type="text" value='\\10.1.16.31\Users$\' id='netRem'></td>
                     </tr>
                     <tr>
                         <td>Network Login ID- Shared/ Generic (AD Access)</td>
                         <td>
-                            <select id="net-shr" disabled>
-                                <option value="NA">NA</option>
+                            <select id="netShr1" disabled>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" selected disabled>NA</option>
                             </select>
                         </td>
-                        <td> <input type="text" class=txt-shr id='net-shr2' disabled> </td>
-                        <td><input type="text" class="txt-shr" id='net-shr3' placeholder="User Name(s) who would be accessing the ID" disabled> </td>
+                        <td> <input type="text" class=txt-shr id='netShr2' disabled> </td>
+                        <td>User Name(s) who would be accessing the ID</td>
                     </tr>
                     <tr>
                         <td>E-mail ID- Individual</td>
                         <td>
-                            <select id="email-ind">
+                            <select id="emailInd1">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" disabled>NA</option>
                             </select>
                         </td>
-                        <td><input type="text" class="txt-ind" id='email-ind2'></td>
-                        <td><input type="text" class="txt-ind" id='email-ind3'></td>
+                        <td><input type="text" class="txt-ind" id='emailInd2'></td>
+                        <td><input type="text" id='emailRem'></td>
                     </tr>
                     <tr>
                         <td>E-mail ID- Shared/ Generic </td>
                         <td>
-                            <select id="email-shr" disabled>
-                                <option value="NA">NA</option>
+                            <select id="emailShr1" disabled>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" selected disabled>NA</option>
                             </select>
                         </td>
-                        <td><input type="text" class="txt-shr" id='email-shr2' disabled placeholder="Divisional CEO"> </td>
-                        <td><input type="text" class="txt-shr" id='email-shr3' placeholder="User Name(s) who would be accessing the ID" disabled> </td>
+                        <td><input type="text" class="txt-shr" id='emailShr2' disabled placeholder="Divisional CEO">
+                        </td>
+                        <td> User Name(s) who would be accessing the ID</td>
                     </tr>
                     <tr>
                         <td>Facility to receive mails from non-ITC E-mail IDs <br>(SMTP inbound)</td>
                         <td>
-                            <select id="SMTPinbound">
+                            <select id="SMTPinbound1">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" disabled>NA</option>
                             </select>
                         </td>
                         <td><input type="text" id='SMTPinbound2'></td>
@@ -199,9 +212,10 @@
                     <tr>
                         <td>Facility to send mails to non-ITC E-mail IDs <br>(SMTP outbound) </td>
                         <td>
-                            <select id="SMTPoutbound">
-                                <option value="No">Yes</option>
-                                <option value="Yes">No</option>
+                            <select id="SMTPoutbound1">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="NA" disabled>NA</option>
                             </select>
                         </td>
                         <td>Head-Finance and MIS for non-management employees</td>
@@ -210,55 +224,55 @@
                     <tr>
                         <td>24 * 7 internet access</td>
                         <td>
-                            <select id="netaccess">
+                            <select id="netAcc1">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
+                                <option value="NA" disabled>NA</option>
                             </select>
                         </td>
                         <td>For below level 6 & non mgmt. Work justification & approvals to be sought</td>
-                        <td><textarea class="form-control" id='netaccess2'></textarea></td>
+                        <td><textarea class="form-control" id='netAcc2'></textarea></td>
                     </tr>
                     <tr>
-                        <td>Default AD Group to be Added ITD_ALL & ITD_CBSC_DLP, ITC_ALL_USERS ITD_Wired_Network_Access</td>
+                        <td>Default AD Group to be Added ITD_ALL & ITD_CBSC_DLP, ITC_ALL_USERS ITD_Wired_Network_Access
+                        </td>
                         <td>
-                            <input type="checkbox" value="TD_All & ITD_CBSC_DLP" class="form-check-input">
+                            <input type="checkbox" value="TD_All & ITD_CBSC_DLP" class="form-check-input" checked>
                             <label>TD_All & ITD_CBSC_DLP</label><br>
-                            <input type="checkbox" value="ITC_ALL_USERS" class="form-check-input">
+                            <input type="checkbox" value="ITC_ALL_USERS" class="form-check-input" checked>
                             <label>ITC_ALL_USERS</label><br>
-                            <input type="checkbox" value="ITD_Wired_Network_Access" class="form-check-input">
+                            <input type="checkbox" value="ITD_Wired_Network_Access" class="form-check-input" checked>
                             <label>ITD_Wired_Network_Access</label>
                         </td>
-                        <td>NA</td>
-                        <td><textarea id='DefaultADGrouptobeAdded2' class='form-control'></textarea></td>
+                        <td><textarea id='DefaultADGroup2' class='form-control'>NA</textarea></td>
+                        <td><textarea id='DefaultADGroup3' class='form-control'></textarea></td>
                     </tr>
                     <tr>
                         <td>Access to shared network drive < Shared drive name>
                         </td>
                         <td>
-                            <select name="" id="shrd-drive">
+                            <select id="shrDrive1">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
                         </td>
                         <td>Approval from Shared drive owner (Refer Annexure Attached)</td>
-                        <td><textarea class='form-control' id='shrd-drive2'></textarea></td>
+                        <td><textarea class='form-control' id='shrDrive2'></textarea></td>
                     </tr>
                     <tr>
                         <td>IT Asset Required Desktop / Laptop </td>
                         <td>
-                            <select id="IT-asset1">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                            <input type="text" id='IT-asset2' list="ITopt">
-                            <datalist id="ITopt">
-                                <option value="Desktop">Desktop</option>
-                                <option value="Laptop">Laptop</option>
-                                <option value="Printer">Printer</option>
-                            </datalist>
+                            <div style="display: flex; gap: 2%;">
+                                <select id="ITasset1">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                <input type="text" id='ITasset2' list="ITopt" title='For multiple items, seperate each with a comma'>
+                                <datalist id="ITopt"></datalist>
+                            </div>
                         </td>
                         <td></td>
-                        <td><textarea id='IT-asset3' class='form-control'></textarea></td>
+                        <td><textarea id='ITasset3' class='form-control'></textarea></td>
                     </tr>
                 </tbody>
             </table>
@@ -281,12 +295,12 @@
                         <select id="VPN1">
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
-                            <option value="NA">NA</option>
+                            <option value="NA" disabled>NA</option>
                         </select>
-                        <input type="date" id="VPN2">
+
                     </td>
+                    <td><textarea class='form-control' id='VPN2'></textarea></td>
                     <td><textarea class='form-control' id='VPN3'></textarea></td>
-                    <td><textarea class='form-control' id='VPN4'></textarea></td>
                 </tr>
             </table>
         </section>
@@ -309,13 +323,19 @@
                     <td>Power Apps</td>
                     <td>
                         <select id='PowerApps1'>
-                            <option value="GenericID">Generic ID</option>
                             <option value="Individual">Individual</option>
+                            <option value="GenericID">Generic ID</option>
+                            <option value="SharedID">SharedID</option>
                             <option value="NA">NA</option>
                         </select>
                     </td>
                     <td><textarea id='PowerApps2' class="form-control powerappdisable"></textarea></td>
-                    <td><textarea id='PowerApps3' class="form-control powerappdisable"></textarea></td>
+                    <td>
+                        <select id='PowerApps3' class='powerappdisable'>
+                            <option value="Permanent">Permanent</option>
+                            <option value="Temporary">Temporary</option>
+                        </select>
+                    </td>
                     <td><textarea id='PowerApps4' class="form-control powerappdisable"></textarea></td>
                     <td>Approvals as defined by the Application Owner for the specific<br> application DITSC for
                         Generic/Shared user IDs.</td>
@@ -326,42 +346,55 @@
 
         <section>
             <table class="table table-bordered">
-                <tr>
-                    <th colspan="6">Access to company systems, applications, data and network through mobile devices
-                    </th>
-                </tr>
-                <tr>
-                    <th>Company systems, applications,<br>data details to which access is required</th>
-                    <th>Make/Model of the Device </th>
-                    <th>IMEI/PIN No.</th>
-                    <th>Date till which access is required </th>
-                    <th>Details of existing device in case the access<br>is being sought for a 2nd device (Make/IMEI)
-                    </th>
-                    <th>Additional approvals to be enclosed</th>
-                </tr>
-                <tr>
-                    <td>
-                        <select id='CompanySystemAccess1'>
-                            <option value="LN on 2nd device">LN on 2nd device</option>
-                            <option value="LN on Mobile">LN on Mobile</option>
-                            <option value="NA">NA</option>
-                        </select>
-                    </td>
-                    <td><textarea id='CompanySystemAccess2' class="form-control CompSysAccessdisable"></textarea></td>
-                    <td><textarea id='CompanySystemAccess3' class="form-control CompSysAccessdisable" placeholder="IMEI Number"></textarea></td>
-                    <td>
-                        <select id='CompanySystemAccess4' class='CompSysAccessdisable'>
-                            <option value="permanent">Permanent</option>
-                            <option value="temporary">Temporary</option>
-                        </select>
-                    </td>
-                    <td><textarea id='CompanySystemAccess5' class="form-control CompSysAccessdisable"></textarea></td>
-                    <td>
-                        1<sup>st</sup> time access:<br>Approval from Divisional CEO < manager designated by Divisional
-                            CEO> and CIO <br><br>
-                            Access on a 2<sup>nd</sup> device: Approval from DFC
-                    </td>
-                </tr>
+                <colgroup>
+                    <col span="1" style="width: 17%;">
+                    <col span="1" style="width: 14%;">
+                    <col span="1" style="width: 13%;">
+                    <col span="1" style="width: 13%;">
+                    <col span="1" style="width: 18%;">
+                    <col span="1" style="width: 25%;">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th colspan="6">Access to company systems, applications, data and network through mobile devices
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Company systems, applications,<br>data details to which access is required</th>
+                        <th>Make/Model of the Device </th>
+                        <th>IMEI/PIN No.</th>
+                        <th>Date till which access is required </th>
+                        <th>Details of existing device in case the access<br>is being sought for a 2nd device
+                            (Make/IMEI)
+                        </th>
+                        <th>Additional approvals to be enclosed</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id='CompSysAcc1'>
+                                <option value="LN on 2nd device">LN on 2nd device</option>
+                                <option value="LN on Mobile">LN on Mobile</option>
+                                <option value="NA">NA</option>
+                            </select>
+                        </td>
+                        <td><textarea id='CompSysAcc2' class="form-control CompSysAccessdisable"></textarea>
+                        </td>
+                        <td><textarea id='CompSysAcc3' class="form-control CompSysAccessdisable"></textarea></td>
+                        <td>
+                            <select id='CompSysAcc4' class='CompSysAccessdisable'>
+                                <option value="Permanent">Permanent</option>
+                                <option value="Temporary">Temporary</option>
+                            </select>
+                        </td>
+                        <td><textarea id='CompSysAcc5' class="form-control CompSysAccessdisable"></textarea>
+                        </td>
+                        <td>
+                            1<sup>st</sup> time access:<br>Approval from Divisional CEO < manager designated by
+                                Divisional CEO> and CIO <br><br>
+                                Access on a 2<sup>nd</sup> device: Approval from DFC
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </section>
 
@@ -376,7 +409,7 @@
                         <input type="text" id='SuperiorName' required onblur="checkEmpty(this)">
                         <small class='HelpBlock'></small>
                     </td>
-                    <th class="required-field">HOD’s/Unit Head’s Name</th>
+                    <th class="required-field">HOD's/Unit Head's Name</th>
                     <td>
                         <input id='UnitHeadName' type="text" required onblur="checkEmpty(this)">
                         <small class='HelpBlock'></small>
@@ -388,6 +421,12 @@
                     <th>Signature</th>
                     <td><input type="text"></td>
                 </tr>
+                <tr>
+                    <th>Date</th>
+                    <td><input type="date" id='SuperiorName_date'></td>
+                    <th>Date</th>
+                    <td><input type="date" id='UnitHeadName_date'></td>
+                </tr>
             </table>
         </section>
 
@@ -397,8 +436,11 @@
                     <th colspan="2">Approval from DMM /Unit IT Head</th>
                 </tr>
                 <tr>
-                    <th>Name</th>
-                    <td><input id='ApprovalFromDMM_name' type="text"></td>
+                    <th><label class="required-field">Name</label></th>
+                    <td>
+                        <input type="text" id='ApprovalFromDMM_name' required onblur="checkEmpty(this)">
+                        <small class='HelpBlock'></small>
+                    </td>
                 </tr>
                 <tr>
                     <th>Signature</th>
@@ -427,7 +469,7 @@
                 <li>If any Company sensitive information is stored in the local hard disk/ removable media, such
                     information shall be stored in an encrypted form to safe guard
                     sensitive information from unauthorized access.</li>
-                <li>Users shall not forward e-mail to any address outside the Company’s network unless the information
+                <li>Users shall not forward e-mail to any address outside the Company's network unless the information
                     owner / originator agrees in advance or the information is
                     clearly public in nature. This policy does not apply to personal e-mails.</li>
                 <li>Automatic forwarding of e-mail messages to an external address could compromise the information
@@ -442,7 +484,7 @@
             <b><u>Refraining from Computer related offences </u></b>
             <ul>
                 <li>Users shall not store, process, or transmit material which is - unlawful, defamatory, harassing,
-                    invasive of any individual’s privacy, abusive, harmful,
+                    invasive of any individual's privacy, abusive, harmful,
                     threatening, vulgar, pornographic, obscene, or otherwise objectionable, offends religious
                     sentiments, or promotes racism.</li>
                 <li>Users shall not use or attempt to initiate activities using information processing resources or
@@ -456,7 +498,7 @@
                             material;</li>
                         <li>Introduce material considered indecent, offensive, or is related to the production, use,
                             storage, or transmission of sexually explicit or
-                            offensive items on the company’s network or systems, using Internet;</li>
+                            offensive items on the company's network or systems, using Internet;</li>
                     </ul>
                 </li>
                 <li>To maintain harmony, e-mail users shall not create or forward e-mail messages that can cause
@@ -478,7 +520,7 @@
                             </ul>
                         </li>
                         <li>Reveal or publicize Company proprietary or sensitive information and represent personal
-                            opinions as those of Company’s;</li>
+                            opinions as those of Company's;</li>
                         <li>Enter into contractual agreements via the Internet unless authorized to do so, e.g. enter
                             into binding contracts on behalf of Company over the
                             Internet;</li>
@@ -527,7 +569,7 @@
                     </ul>
                 </li>
             </ul>
-            <span class='text-center'><b><u>Security of Company’s IT Asset</u></b></span>
+            <span class='text-center'><b><u>Security of Company's IT Asset</u></b></span>
             <ul>
                 <li>Users shall pay attention to security warnings. When a system gives a security warning, users shall
                     make sure to read the security warning and report to the IT team. In
@@ -555,9 +597,9 @@
                 </li>
             </ul>
             <br>
-            <span class='text-center'><b><u>Security of Company’s IT Asset</u></b></span>
+            <span class='text-center'><b><u>Security of Company's IT Asset</u></b></span>
             <ul>
-                <li>To ensure optimalutilizationof the Company’s data storage resources, every user should delete
+                <li>To ensure optimalutilizationof the Company's data storage resources, every user should delete
                     unwantedmessages as a practice. Housekeeping of mailbox shall be the
                     responsibility of individual user.</li>
                 <li>Users shall ensure proper restart of laptops / desktops while connected to ITC LAN at least once in
@@ -578,11 +620,11 @@
                     leaving for the day.</li>
             </ul>
             <br>
-            <span class='text-center'><b><u>Security of Company’s IT Asset</u></b></span>
+            <span class='text-center'><b><u>Security of Company's IT Asset</u></b></span>
             <ul>
                 <li>Company respects the individual privacy. However, owing to legal and ethical reasons:-
                     <ul style="list-style: circle;">
-                        <li>Privacy shall not extend to the use of the Company’s Information assets / services. Company
+                        <li>Privacy shall not extend to the use of the Company's Information assets / services. Company
                             reserves the right to log, monitor and inspect use of all
                             Information assets / services provided to its employees. The user understands that such
                             monitoring may involve access to any personal data or
@@ -591,18 +633,18 @@
                             consent and authority to the Company to that affect.</li>
                         <li>In order to ensure privacy to e-mail users, the e-mail administrator shall not scrutinize
                             the
-                            contents of the users’ mailbox. However, in exceptional circumstances,the Chairman - CITSC
+                            contents of the users' mailbox. However, in exceptional circumstances,the Chairman - CITSC
                             may grant the permission to scrutinize the e-mails of a specific
                             user for a specific period.</li>
                     </ul>
                 </li>
-                <li>To protect the Company’s interests, it can initiate necessary action for:
+                <li>To protect the Company's interests, it can initiate necessary action for:
                     <ul style="list-style: circle;">
-                        <li>suspected misuse that may cause damage to Company’s interests and image</li>
-                        <li>User’s non-compliance with regulations</li>
+                        <li>suspected misuse that may cause damage to Company's interests and image</li>
+                        <li>User's non-compliance with regulations</li>
                     </ul>
                 </li>
-                <li>To safeguard the Company’s interest, IT facilities provided to an employee can be withdrawn at any
+                <li>To safeguard the Company's interest, IT facilities provided to an employee can be withdrawn at any
                     time at the discretion of the Company.</li>
             </ul>
             </p>
@@ -615,15 +657,16 @@
                     </th>
                 </tr>
                 <tr>
-                    <td>Name of the User:-</td>
-                    <td><input type="text" id='username2'></td>
-                    <td rowspan="2">Employee Code:-</td>
-                    <td rowspan="2"><input type="text" id='empid2'></td>
+                    <td> <label class="required-field">Name of the User:- </label> </td>
+                    <td><input type="text" id='fullname' readonly></td>
+                    <td rowspan="2"><label class="required-field"> Code:- </label></td>
+                    <td rowspan="2"><input type="text" id='empid2' readonly></td>
                 </tr>
                 <tr>
-                    <td>Division/SBU & Location:-</td>
+                    <td><label class="required-field"> Division/SBU & Location:- </label></td>
                     <td>
-                        <input id='divloc' type="text" list="Divloclist">
+                        <input id='divloc' type="text" list="Divloclist" required onblur="checkEmpty(this)">
+                        <small class='HelpBlock'></small>
                         <datalist id='Divloclist'> </datalist>
                     </td>
                 </tr>
@@ -635,8 +678,10 @@
                 </tr>
             </table>
         </section>
-        <input type="submit" value="Submit">
+        <input type="submit" id='submitbtn' value="Submit" style="width: auto" class="btn btn-lg btn-primary">
+        <input type="button" style="width: auto" value="Print" class="btn btn-lg btn-primary" onclick="window.print();">
     </form>
+
     <!-- The Modal -->
     <div id="myModal" class="modal">
         <!-- Modal content -->
@@ -644,16 +689,13 @@
             <span id="close">&times;</span>
             <form onsubmit="fetchData(event)">
                 <label>Enter EmployeeID</label>
-                <input type="text" required name='Empid'>
-                <input type="submit">
+                <input type="text" required id='empid'>
+                <input type="submit" style="width: auto" class="btn btn-lg btn-primary my-3" >
             </form>
         </div>
     </div>
-    
+
     <script src="js/index.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
 </body>
 
 </html>
